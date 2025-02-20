@@ -13,6 +13,7 @@ level2 = sti("levels/Level2.lua")
 level3 = sti("levels/Level3.lua")
 level4 = sti("levels/Level4.lua")
 level5 = sti("levels/Level5.lua")
+level6 = sti("levels/Level6.lua")
 
 --Other scripts
 local mainMenu = require"menu"
@@ -27,6 +28,15 @@ function love.load()
     spaceMusic:setLooping(true)
 
     planetMusic = love.audio.newSource("songs/MysteryMp3.mp3","stream")
+    planetMusic:setLooping(true)
+
+    menuMusic = love.audio.newSource("songs/mainMenu.wav","stream")
+    menuMusic:setLooping(true)
+
+    sigmaMusic = love.audio.newSource("songs/endsong.mp3","stream")
+    sigmaMusic:setLooping(true)
+
+    menuMusic:play()
 
     --Font setting
     font = love.graphics.newFont("font/WorkSans.ttf",27)
@@ -50,6 +60,7 @@ function love.load()
     spaceBG = love.graphics.newImage("sprites/BackgroundSpaceBugy.png")
     planetBG = love.graphics.newImage("sprites/BackgroundBugyPlane3t.png")
     tree = love.graphics.newImage("sprites/Tree.png")
+    shaggy = love.graphics.newImage("sprites/shaggyEvil.png")
 
     --Sound effects
     jumpSFX = love.audio.newSource("sfx/jump.wav","static")
@@ -122,6 +133,8 @@ function love.update(dt)
 
         if love.keyboard.isDown("escape") and player.level > 0 then
             player.level = 0
+            love.audio.stop()
+            menuMusic:play()
         end
 
          --Flips
@@ -246,8 +259,21 @@ function love.draw()
                 love.graphics.draw(norgangster,player.x,player.y,nil,0.5,0.5,70,170)
             end
             level5:drawLayer(level5.layers["Ground"])
-
-            world:draw()
+            level5:drawLayer(level5.layers["Probs"])
+            level5:drawLayer(level5.layers["Alien"])
+            --world:draw()
+        cam:detach()
+    elseif player.level == 6 then
+        love.graphics.draw(planetBG)
+        cam:attach()
+            if gravityY < 0 then
+                love.graphics.draw(gangster,player.x,player.y,nil,0.5,0.5,70,110)
+            else
+                love.graphics.draw(norgangster,player.x,player.y,nil,0.5,0.5,70,170)
+            end
+            level6:drawLayer(level6.layers["Ground"])
+            level6:drawLayer(level6.layers["Probs"])
+            love.graphics.draw(shaggy,1776,155)
         cam:detach()
     end
     if player.level > 0 then
@@ -484,12 +510,70 @@ function levelLoader(level)
         love.audio.stop()
         planetMusic:play()
 
+        --Platforms
         table.insert(g,world:newRectangleCollider(112,560,96,192))
         table.insert(g,world:newRectangleCollider(112,48,96,192))
+        table.insert(g,world:newRectangleCollider(560,0,96,96))
+        table.insert(g,world:newRectangleCollider(960,640,96,96))
+        table.insert(g,world:newRectangleCollider(704,1104,96,96))
+        table.insert(g,world:newRectangleCollider(1312,1376,32,32))
+        table.insert(g,world:newRectangleCollider(1632,1392,96,16))
+        table.insert(g,world:newRectangleCollider(2080,1392,96,16))
+        table.insert(g,world:newRectangleCollider(2432,1328,96,32))
 
 
+        --Spikes
+        table.insert(s,world:newRectangleCollider(528,32,32,32))
+        table.insert(s,world:newRectangleCollider(624,96,32,32))
+        table.insert(s,world:newRectangleCollider(768,320,32,128))
+        table.insert(s,world:newRectangleCollider(800,352,32,32))
+        table.insert(s,world:newRectangleCollider(736,384,32,32))
+        table.insert(s,world:newRectangleCollider(1024,608,32,32))
+        table.insert(s,world:newRectangleCollider(704,1072,1888,32))
+        table.insert(s,world:newRectangleCollider(672,1104,32,64))
+        table.insert(s,world:newRectangleCollider(816,1136,480+1296,32))
+        table.insert(s,world:newRectangleCollider(1488,1360,32,240))
+        table.insert(s,world:newRectangleCollider(1456,1392,32,176))
+        table.insert(s,world:newRectangleCollider(1520,1392,32,176))
+        table.insert(s,world:newRectangleCollider(1888,1168,32,256))
+        table.insert(s,world:newRectangleCollider(1856,1200,32,192))
+        table.insert(s,world:newRectangleCollider(1920,1200,32,192))
 
 
+        --Orbs
+        table.insert(o,world:newRectangleCollider(976,1296,32,16))
+        table.insert(o,world:newRectangleCollider(976,1296+36,32,16))
+        
+        --Goal
+        table.insert(f,world:newRectangleCollider(2848,880,112,64))
+    elseif level == 6 then
+        player.jumpforce = -4750
+        gravityY = 1000 
+        player.collider:setPosition(150,200)
+        world:setGravity(0,gravityY)
+
+        love.audio.stop()
+        sigmaMusic:play()
+
+        --Platforms
+        table.insert(g,world:newRectangleCollider(160,448,96,96))
+        table.insert(g,world:newRectangleCollider(416,336,96,96))
+        table.insert(g,world:newRectangleCollider(528,336,576,16))
+        table.insert(g,world:newRectangleCollider(1216,432,96,96))
+        table.insert(g,world:newRectangleCollider(1472,384,592,64))
+
+        --Spikes
+        table.insert(s,world:newRectangleCollider(224,416,32,32))
+        table.insert(s,world:newRectangleCollider(528,304,32,32))
+        table.insert(s,world:newRectangleCollider(672,304,32,32))
+        table.insert(s,world:newRectangleCollider(816,304,160,32))
+        table.insert(s,world:newRectangleCollider(1072,304,32,32))
+
+        --Finish
+        table.insert(f,world:newRectangleCollider(1750,48,448,336))
+    elseif level == 7 then
+        love.system.openURL("https://www.youtube.com/watch?v=6qQJvUfBDOQ")
+        love.event.quit() 
     end
 
     for i, grounds in ipairs(g) do 
